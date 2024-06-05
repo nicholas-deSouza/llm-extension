@@ -1,22 +1,31 @@
 // from https://ibaslogic.com/simple-guide-to-react-form/
 import { useState } from "react";
 const Form = () => {
-  const [fname, setFname] = useState("");
+  const [text, setText] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFname(e.target.value);
+    setText(e.target.value);
+  };
+
+  const passwordView = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
     <>
-      <h1>Controlled Form</h1>
       <form>
         <label>
-          First Name:{""}
-          <input type="text" value={fname} onChange={handleChange} />
+          LLM API Key:{""}
+          <input
+            type={showPassword ? "text" : "password"}
+            value={text}
+            onChange={handleChange}
+          ></input>
         </label>
       </form>
-      <h5>First name: {fname}</h5>
+      <button onClick={passwordView}>{showPassword.toString()}</button>
+      <h5>Text: {text}</h5>
     </>
   );
 };
