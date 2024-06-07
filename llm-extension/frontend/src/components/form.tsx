@@ -4,6 +4,8 @@ import { useState } from "react";
 import axios from "axios";
 import React from "react";
 
+import LlmResponse from "./llmResponse";
+
 // object shape of information recieved from form
 interface FormData {
   api_key: string;
@@ -11,12 +13,14 @@ interface FormData {
 }
 
 const Form = () => {
-  const [apiKey, setapiKey] = useState("");
+  const [apiKey, setApiKey] = useState("");
   const [text, setText] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [apiResponse, setApiResponse] = useState("");
+  const [showChildComponent, setShowChildComponent] = useState(false);
 
   const handleAPITextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setapiKey(event.target.value);
+    setApiKey(event.target.value);
   };
 
   const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,10 +33,12 @@ const Form = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     const data = {
       api_key: apiKey,
       query: text,
     };
+
     sendQueryAndKey(data);
   };
 
@@ -44,7 +50,8 @@ const Form = () => {
         },
       });
 
-      console.log(response.data);
+      setApiResponse(response.data);
+      setShowChildComponent(true);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -73,6 +80,7 @@ const Form = () => {
       </form>
       <button onClick={passwordView}>{showPassword.toString()}</button>
       <h5>Text: {apiKey}</h5>
+      <div>{showChildComponent && <LlmResponse apiResponse={apiResponse} />}</div>
     </>
   );
 };

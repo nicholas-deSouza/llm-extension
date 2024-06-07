@@ -12,13 +12,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class LLM_Key_and_Query(BaseModel):
+class LLM_Key_and_Query_Model(BaseModel):
     api_key: str
     query: str
 
 # for now just use OpenAI API, eventually use Langchain to allow for multiple LLMs
 @app.post("/run_query/")
-async def LLM_Response(key_and_query: LLM_Key_and_Query):
+async def LLM_Response(key_and_query: LLM_Key_and_Query_Model):
     api_key = key_and_query.api_key
     query = key_and_query.query
 
