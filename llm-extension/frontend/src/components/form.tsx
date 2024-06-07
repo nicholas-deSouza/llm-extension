@@ -2,20 +2,21 @@
 import { useState } from "react";
 
 import axios from "axios";
+import React from "react";
 
 // object shape of information recieved from form
 interface FormData {
-  value1: string;
-  value2: string;
+  api_key: string;
+  query: string;
 }
 
 const Form = () => {
-  const [apiText, setapiText] = useState("");
+  const [apiKey, setapiKey] = useState("");
   const [text, setText] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleAPITextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setapiText(event.target.value);
+    setapiKey(event.target.value);
   };
 
   const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,15 +30,15 @@ const Form = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = {
-      value1: apiText,
-      value2: text,
+      api_key: apiKey,
+      query: text,
     };
     sendQueryAndKey(data);
   };
 
   const sendQueryAndKey = async (data: FormData) => {
     try {
-      const response = await axios.post("https://your-backend-url.com/endpoint", data, {
+      const response = await axios.post("http://127.0.0.1:8000/run_query/", data, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -57,7 +58,7 @@ const Form = () => {
           <input
             className="api-key"
             type={showPassword ? "text" : "password"}
-            value={apiText}
+            value={apiKey}
             onChange={handleAPITextChange}
           ></input>
           What's your question?:{""}
@@ -67,10 +68,11 @@ const Form = () => {
             value={text}
             onChange={handleTextChange}
           ></input>
+          <input type="submit"></input>
         </label>
       </form>
       <button onClick={passwordView}>{showPassword.toString()}</button>
-      <h5>Text: {apiText}</h5>
+      <h5>Text: {apiKey}</h5>
     </>
   );
 };
