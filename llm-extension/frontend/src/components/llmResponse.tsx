@@ -1,16 +1,14 @@
 import React from "react";
 
-const LlmResponse = ({ apiResponse }) => {
+// defines the types of props being passed down to this component
+interface LlmResponseProps {
+  apiResponse: string;
+}
+
+// Memoizing the component makes it so that it only re-renders when the prop changes
+const LlmResponse: React.FC<LlmResponseProps> = React.memo(({ apiResponse }) => {
   console.log("this is the response in the LlmResponse", apiResponse);
   return <div>hi</div>;
-};
-
-// const LlmResponse = React.memo(({ apiResponse }) => {
-//   return (
-//     <div>
-//       <p>{apiResponse}</p>
-//     </div>
-//   );
-// });
+});
 
 export default LlmResponse;

@@ -50,8 +50,8 @@ const Form = () => {
         },
       });
 
-      setApiResponse(response.data);
       setShowChildComponent(true);
+      setApiResponse(response.data);
     } catch (error) {
       console.error("Error:", error);
     }
