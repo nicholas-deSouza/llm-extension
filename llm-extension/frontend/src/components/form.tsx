@@ -12,11 +12,19 @@ interface FormData {
   query: string;
 }
 
+// used so that typescript understands the type of ApiResponse
+// specifies that apiResponse is an object with a response property, which itself is an object containing a content string.
+interface ApiResponse {
+  response: {
+    content: string;
+  };
+}
+
 const Form = () => {
   const [apiKey, setApiKey] = useState("");
   const [text, setText] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [apiResponse, setApiResponse] = useState("");
+  const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
   const [showChildComponent, setShowChildComponent] = useState(false);
 
   const handleAPITextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
