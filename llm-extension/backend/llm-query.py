@@ -17,6 +17,7 @@ class LLM_Key_and_Query_Model(BaseModel):
     query: str
 
 # for now just use OpenAI API, eventually use Langchain to allow for multiple LLMs
+# note: look into streaming responses with Langchain
 @app.post("/run_query/")
 async def LLM_Response(key_and_query: LLM_Key_and_Query_Model):
     api_key = key_and_query.api_key
@@ -33,6 +34,9 @@ async def LLM_Response(key_and_query: LLM_Key_and_Query_Model):
     )
 
     print(completion.choices[0].message)
+    # for chunk in stream:
+    #     if chunk.choices[0].delta.content is not None:
+    #         print(chunk.choices[0].delta.content, end="")
 
     return{
         "response":completion.choices[0].message
