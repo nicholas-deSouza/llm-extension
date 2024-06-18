@@ -1,0 +1,41 @@
+.profile-icon-div {
+  border: 5px solid red;
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px;
+}
+
+.chats-div {
+  text-align: center;
+  border: 5px solid red;
+  position: fixed;
+  top: 80px;
+  left: 15%;
+  transform: translateX(-50%);
+}
+
+text {
+  font-size: 28px;
+}
+
+.choose-llm-btn-div {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  width: 100%;
+}
+
+button {
+  width: 50%;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box; /* Ensures padding and border are included in the width */
+}
+
+.button:focus {
+  outline: none;
+}
