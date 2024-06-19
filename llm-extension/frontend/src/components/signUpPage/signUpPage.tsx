@@ -1,7 +1,26 @@
 import React from "react";
+import { createClient } from "@supabase/supabase-js";
+import { useNavigate } from "react-router-dom";
 import "./signUpPage.css";
 
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_PROJECT_URL as string,
+  import.meta.env.VITE_SUPABASE_API_KEY as string
+);
+
 export default function SignUpPage() {
+  const navigate = useNavigate();
+
+  supabase.auth.onAuthStateChange(async (event) => {
+    if (event !== "SIGNED_OUT") {
+      // forward to success URL
+      navigate("/success");
+    } else {
+      // forward to localhost:3000
+      navigate("/");
+    }
+  });
+
   return (
     <div>
       <div className="app-name">
