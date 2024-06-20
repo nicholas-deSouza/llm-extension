@@ -1,11 +1,6 @@
 import React from "react";
-import { createClient } from "@supabase/supabase-js";
 import { useNavigate } from "react-router-dom";
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_PROJECT_URL as string,
-  import.meta.env.VITE_SUPABASE_API_KEY as string
-);
+import { supabase } from "../../utils/supabaseClient";
 
 export default function SuccessPage() {
   const navigate = useNavigate();
