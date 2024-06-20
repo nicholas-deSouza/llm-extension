@@ -31,14 +31,11 @@ export default function SignUpPage() {
 
       if (error) {
         console.error("Error signing up:", error.message);
-        // Handle error (e.g., display error message)
       } else {
-        console.log("User signed up:", data); // Successfully signed up user object
-        // // Redirect to success page
+        console.log("User signed up:", data);
       }
     } catch (error) {
       console.error("Error:", error);
-      // Handle error (e.g., display error message)
     }
   };
 
