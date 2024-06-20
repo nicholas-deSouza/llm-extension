@@ -1,3 +1,4 @@
+// necessary, do not remove or this file won't understand how to grab env variables
 /// <reference types="vite/client" />
 import { createClient } from "@supabase/supabase-js";
 
