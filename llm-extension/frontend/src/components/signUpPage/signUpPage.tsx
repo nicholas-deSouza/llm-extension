@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useNavigate } from "react-router-dom";
 import "./signUpPage.css";
@@ -42,20 +42,22 @@ export default function SignUpPage() {
     }
   };
 
-  // fix this, without useEffect it automatically goes to success
-  // with useEffect, it will keep running multiple times including when the inspect console is opened
-  // might be how navigate works
-  supabase.auth.onAuthStateChange(async (event, session) => {
-    // if signed in
-    console.log(event, session);
-    if (event === "SIGNED_IN") {
-      // forward to success URL
-      navigate("/success");
-    } else {
-      // forward to localhost:3000
-      navigate("/");
-    }
-  });
+  useEffect(() => {
+    // destructuring the object returned by supabase.auth.onAuthStateChange
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log(session);
+      if (event === "SIGNED_IN") {
+        navigate("/success");
+      } else {
+        navigate("/");
+      }
+    });
+
+    // this removes the listener created above to stop the component from being re rendered
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   return (
     <div>
