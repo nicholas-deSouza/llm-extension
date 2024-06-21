@@ -41,7 +41,7 @@ export default function SignUpPage() {
       if (event === "SIGNED_IN") {
         navigate("/success");
       } else {
-        navigate("/");
+        navigate("/signup");
       }
     });
 
@@ -77,6 +77,9 @@ export default function SignUpPage() {
           <button onClick={onSignUp} className="sign-up-btn">
             <h3>Sign up</h3>
           </button>
+          <p>
+            Already have an account? <a href="http://localhost:5173/login">Login here!</a>
+          </p>
         </form>
       </div>
     </div>

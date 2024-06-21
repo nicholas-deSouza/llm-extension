@@ -19,15 +19,13 @@ export default function LoginPage() {
   const onLogIn = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
         console.error("Error signing in:", error.message);
-      } else {
-        console.log("User signed in:", data);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -36,12 +34,11 @@ export default function LoginPage() {
 
   useEffect(() => {
     // destructuring the object returned by supabase.auth.onAuthStateChange
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log(session);
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event) => {
       if (event === "SIGNED_IN") {
         navigate("/success");
       } else {
-        navigate("/");
+        navigate("/login");
       }
     });
 
@@ -77,6 +74,9 @@ export default function LoginPage() {
           <button onClick={onLogIn} className="login-btn">
             <h3>Login</h3>
           </button>
+          <p>
+            Don't have an account? <a href="http://localhost:5173/signup">Sign up here!</a>
+          </p>
         </form>
       </div>
     </div>

@@ -1,9 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../utils/supabaseClient";
 
 export default function SuccessPage() {
+  const [user, setUser] = useState({});
   const navigate = useNavigate();
+
+  useEffect(() => {
+    async function getUserData() {
+      await supabase.auth.getUser().then((value) => {
+        if (value.data?.user) {
+          setUser(value.data.user);
+        }
+      });
+    }
+
+    getUserData();
+  }, []);
+
+  useEffect(() => {
+    console.log("user data:", user);
+  }, []);
 
   const onSignOut = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -14,7 +31,7 @@ export default function SuccessPage() {
         console.error("Error signing up:", error.message);
       } else {
         console.log("User signed out:");
-        navigate("/");
+        navigate("/login");
       }
     } catch (error) {
       console.error("Error:", error);
