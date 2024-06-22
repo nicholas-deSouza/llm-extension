@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 app = FastAPI()
 
+from pydantic import BaseModel
 import requests
 from pprint import pprint
 
@@ -31,28 +32,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-llm = ChatOpenAI(temperature=1, model_name="gpt-4o", api_key=OPENAI_API_KEY)
-conversation = ConversationChain(
-  llm = llm,
-  memory = ConversationEntityMemory(llm = llm),
-  prompt = ENTITY_MEMORY_CONVERSATION_TEMPLATE,
-  verbose = False
-)
+class Human_Message(BaseModel):
+    userInput: str
 
-try:
-    while True:
-        user_input = input("> ")
+@app.post("/get_llm_response/")
+async def get_llm_response(text: Human_Message):
+      input = text.userInput
 
-        if user_input.lower() in {"exit", "quit"}:
-            print("Ending conversation.")
-            break
+      llm = ChatOpenAI(temperature=1, model_name="gpt-4o", api_key=OPENAI_API_KEY)
+      conversation = ConversationChain(
+        llm = llm,
+        memory = ConversationEntityMemory(llm = llm),
+        prompt = ENTITY_MEMORY_CONVERSATION_TEMPLATE,
+        verbose = False
+      )
 
-        ai_response = conversation.predict(input = user_input)
-        print("\nAssistant: \n", ai_response)
-        conversation.memory.entity_store.store
+      ai_response = conversation.predict(input = input)
+      return {"response": {"content": ai_response}}
 
-except KeyboardInterrupt:
-    print("\nConversation interrupted by user.")
-
-print("\nFinal Memory Store:")
-pprint(conversation.memory.entity_store.store)
+# @app.options("/get_llm_response/")
+# async def options_get_llm_response():
+#     return {"status": "ok"}
