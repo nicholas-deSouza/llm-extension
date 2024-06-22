@@ -6,7 +6,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import SignUpPage from "./components/signUpPage/signUpPage";
 import SuccessPage from "./components/successPage/successPage";
 import LoginPage from "./components/loginPage/loginPage";
-// import HomePage from "./components/homePage/homePage";
+import HomePage from "./components/homePage/homePage";
+import ChatScreen from "./components/chatScreen/chatScreen";
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/success" element={<SuccessPage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/chat" element={<ChatScreen />} />
         </Routes>
       </Router>
     </>

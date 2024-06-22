@@ -1,11 +1,14 @@
 import React from "react";
 import "./homePage.css";
+// import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
+  // const navigate = useNavigate();
+
   return (
     <div>
       <div className="profile-icon-div">
-        <a>temp</a>
+        <a>profile</a>
       </div>
       <div className="chats-div">
         <text>Chats + </text>

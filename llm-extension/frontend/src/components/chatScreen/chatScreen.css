@@ -1,0 +1,36 @@
+.chat-screen {
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+}
+
+.chat-container {
+  flex: 1;
+  padding: 10px;
+  width: 700px;
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-container {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+}
+
+.user-input {
+  flex: 1;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.message {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  background-color: black;
+  align-self: flex-end; /* Aligns the message to the right */
+  clear: both; /* Ensures messages are not on the same line */
+  width: fit-content; /* Adjusts the width of the message container */
+}
