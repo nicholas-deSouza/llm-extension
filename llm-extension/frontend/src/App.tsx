@@ -13,6 +13,7 @@ function App() {
     <>
       <Router>
         <Routes>
+          {/* redirects so that i don't manually have to do it */}
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />

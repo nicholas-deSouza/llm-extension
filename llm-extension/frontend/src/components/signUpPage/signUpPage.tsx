@@ -19,7 +19,7 @@ export default function SignUpPage() {
   const onSignUp = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
       });
@@ -27,7 +27,7 @@ export default function SignUpPage() {
       if (error) {
         console.error("Error signing up:", error.message);
       } else {
-        console.log("User signed up:", data);
+        alert("Check your email for the login link");
       }
     } catch (error) {
       console.error("Error:", error);
