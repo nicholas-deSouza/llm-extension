@@ -6,17 +6,15 @@ interface UserInput {
   userInput: string;
 }
 
-// so the frontend understands the structure of the response object coming from the backend
-interface ApiResponse {
-  response: {
-    content: string;
-  };
+// used to create the structure of both types of messages expected, user or llm
+interface Message {
+  text: string;
+  isUser: boolean;
 }
 
 export default function ChatScreen() {
   const [text, setText] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
-  const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value);
@@ -24,14 +22,16 @@ export default function ChatScreen() {
 
   const handleSend = () => {
     if (text.trim() !== "") {
-      setMessages([...messages, text]);
+      const userMessage: Message = { text: text, isUser: true };
+      setMessages([...messages, userMessage]);
       setText("");
-    }
 
-    const data = {
-      userInput: text,
-    };
-    sendUserInput(data);
+      // to make sure that the information being sent to backend is correct format
+      const data = {
+        userInput: text,
+      };
+      sendUserInput(data);
+    }
   };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -49,7 +49,8 @@ export default function ChatScreen() {
       });
 
       if (response && response.data && response.data.response && response.data.response.content) {
-        setApiResponse(response.data);
+        const llmMessage: Message = { text: response.data.response.content, isUser: false };
+        setMessages((prevMessages) => [...prevMessages, llmMessage]);
       } else {
         console.error("Invalid response format:", response.data);
       }
@@ -62,12 +63,12 @@ export default function ChatScreen() {
     <div className="chat-screen">
       <div className="chat-container">
         {messages.map((message, index) => (
-          <div key={index} className="message">
-            {message}
+          // displays the messages in their correct locations depending on if it's a user or llm message
+          <div key={index} className={`message ${message.isUser ? "user-message" : "llm-message"}`}>
+            {message.text}
           </div>
         ))}
       </div>
-      <div>{apiResponse?.response.content}</div>
       <div className="input-container">
         <input
           className="user-input"
@@ -76,8 +77,8 @@ export default function ChatScreen() {
           placeholder="Ask your question to the LLM"
           onChange={handleTextChange}
           onKeyDown={handleKeyPress}
-        ></input>
-        <button onClick={handleSend}> send </button>
+        />
+        <button onClick={handleSend}>send</button>
       </div>
     </div>
   );

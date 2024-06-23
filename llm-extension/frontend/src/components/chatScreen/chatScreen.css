@@ -34,3 +34,13 @@
   clear: both; /* Ensures messages are not on the same line */
   width: fit-content; /* Adjusts the width of the message container */
 }
+
+.llm-message {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  background-color: black;
+  align-self: flex-start; /* Aligns the message to the right */
+  clear: both; /* Ensures messages are not on the same line */
+  width: fit-content; /* Adjusts the width of the message container */
+}
