@@ -12,6 +12,10 @@ from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationEntityMemory
 from langchain.memory.prompt import ENTITY_MEMORY_CONVERSATION_TEMPLATE
+from langchain.callbacks import AsyncIteratorCallbackHandler
+import asyncio
+from typing import AsyncIterable
+from fastapi.responses import StreamingResponse
 
 
 load_dotenv(dotenv_path='./.env')
@@ -50,6 +54,40 @@ async def get_llm_response(text: Human_Message):
       ai_response = conversation.predict(input = input)
       return {"response": {"content": ai_response}}
 
-# @app.options("/get_llm_response/")
-# async def options_get_llm_response():
-#     return {"status": "ok"}
+
+async def send_message(userInput: str) -> AsyncIterable[str]:
+    callback = AsyncIteratorCallbackHandler()
+    model = ChatOpenAI(
+        streaming=True,
+        verbose=True,
+        callbacks=[callback],
+    )
+
+    task = asyncio.create_task(
+        model.agenerate(messages=[userInput])
+    )
+
+    try:
+        async for token in callback.aiter():
+            yield token
+    except Exception as e:
+        print(f"Caught exception: {e}")
+    finally:
+        callback.done.set()
+
+    await task
+
+@app.post("/stream_chat/")
+async def stream_chat(message: Human_Message):
+    generator = send_message(message.userInput)
+    return StreamingResponse(generator, media_type="text/event-stream")
+
+# @app.post("/get_llm_response_streaming/")
+# async def get_llm_response(text: Human_Message):
+#     input = text.userInput
+
+#     llm = ChatOpenAI(temperature=1, model_name="gpt-4o", api_key=OPENAI_API_KEY)
+#     for chunk in llm.stream(input=input):
+#       print(chunk, end="", flush=True)
+
+
