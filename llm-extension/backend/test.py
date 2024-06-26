@@ -2,12 +2,24 @@ import os
 from dotenv import load_dotenv
 import asyncio
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 app = FastAPI()
 
+class Human_Message(BaseModel):
+    userInput: str
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Adjust to your frontend's origin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 load_dotenv(dotenv_path='./.env')
 
@@ -27,15 +39,17 @@ prompt = prompt_not_cleaned.messages[0].prompt.template
 parser = StrOutputParser()
 
 
-async def generate_chat_responses(prompt:str):
-   async for chunk in model.astream(prompt):
+async def generate_chat_responses(input:str):
+   async for chunk in model.astream(input):
     #   content = chunk.replace("\n", "<br>")
       yield f"{chunk.content}"
+      
 
 
-@app.get("/chat_stream/")
-async def chat_stream_events():
-    return StreamingResponse(generate_chat_responses(prompt=prompt))
+@app.post("/chat_stream/")
+async def chat_stream_events(text: Human_Message):
+    input = text.userInput
+    return StreamingResponse(generate_chat_responses(input=input))
 
 
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./chatScreen.css";
-import axios from "axios";
+// import axios from "axios";
 
 interface UserInput {
   userInput: string;
@@ -15,6 +15,7 @@ interface Message {
 export default function ChatScreen() {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  //   const [streamingMessage, setStreamingMessage] = useState("");
 
   const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value);
@@ -30,7 +31,7 @@ export default function ChatScreen() {
       const data = {
         userInput: text,
       };
-      sendUserInput(data);
+      readStream(data);
     }
   };
 
@@ -40,28 +41,89 @@ export default function ChatScreen() {
     }
   };
 
-  const sendUserInput = async (data: UserInput) => {
+  //refactor this to use fetch instead to stream responses
+  //   const sendUserInput = async (data: UserInput) => {
+  //     try {
+  //       const response = await axios.post("http://127.0.0.1:8000/chat_stream/", data, {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       });
+
+  //       if (response && response.data) {
+  //         const llmMessage: Message = { text: response.data, isUser: false };
+  //         setMessages((prevMessages) => [...prevMessages, llmMessage]);
+  //       } else {
+  //         console.error("Invalid response format:", response.data);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error:", error);
+  //     }
+  //   };
+
+  const appendChunk = (value: string) => {
+    // prevMessages is the current state of the messages array before updates
+    setMessages((prevMessages) => {
+      // gets the last message from prevMessages
+      const lastMessage = prevMessages[prevMessages.length - 1];
+
+      // checks to see if it's the LLM response
+      if (lastMessage && !lastMessage.isUser) {
+        // creates shallow copy of the prevMessages
+        const updatedMessage = [...prevMessages];
+        // creates new object with properties of lastMessage
+        // and updates the text property
+        // assigns new created object to the end of updatedMessage
+        updatedMessage[updatedMessage.length - 1] = {
+          ...lastMessage,
+          text: lastMessage.text + value,
+        };
+        return updatedMessage;
+      } else {
+        return [...prevMessages, { text: value, isUser: false }];
+      }
+    });
+  };
+
+  const readStream = async (data: UserInput) => {
     try {
-      const response = await axios.post("http://127.0.0.1:8000/get_llm_response/", data, {
+      await fetch("http://127.0.0.1:8000/chat_stream/", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-      });
+        body: JSON.stringify(data),
+      }).then(async function (response) {
+        const reader = response.body!.pipeThrough(new TextDecoderStream()).getReader();
 
-      if (response && response.data && response.data.response && response.data.response.content) {
-        const llmMessage: Message = { text: response.data.response.content, isUser: false };
-        setMessages((prevMessages) => [...prevMessages, llmMessage]);
-      } else {
-        console.error("Invalid response format:", response.data);
-      }
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          const { value, done } = await reader.read();
+
+          if (done) break;
+          appendChunk(value!);
+          //   console.log("Received", value);
+        }
+
+        // const llmMessage: Message = { text: streamingMessage, isUser: false };
+        // setMessages((prevMessages) => [...prevMessages, llmMessage]);
+        // setStreamingMessage("");
+
+        // const responseText = await response.text();
+        // console.log(responseText);
+        // const llmMessage: Message = { text: responseText, isUser: false };
+        // setMessages((prevMessages) => [...prevMessages, llmMessage]);
+        //   return response.text();
+      });
     } catch (error) {
-      console.error("Error:", error);
+      console.log("Error with reading stream:", error);
     }
   };
 
   return (
     <div className="chat-screen">
       <div className="chat-container">
+        {/* <div className="test">hi, {inProgress}</div> */}
         {messages.map((message, index) => (
           // displays the messages in their correct locations depending on if it's a user or llm message
           <div key={index} className={`message ${message.isUser ? "user-message" : "llm-message"}`}>
