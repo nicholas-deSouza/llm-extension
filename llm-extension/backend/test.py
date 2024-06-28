@@ -40,16 +40,16 @@ parser = StrOutputParser()
 
 
 async def generate_chat_responses(input:str):
-   async for chunk in model.astream(input):
+   async for chunk in model.pipe(parser).astream(input):
     #   content = chunk.replace("\n", "<br>")
-      yield f"{chunk.content}"
+      yield f"{chunk}"
       
 
 
 @app.post("/chat_stream/")
 async def chat_stream_events(text: Human_Message):
     input = text.userInput
-    return StreamingResponse(generate_chat_responses(input=input))
+    return StreamingResponse(generate_chat_responses(input=input), media_type="text/markdown")
 
 
 

@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import "./chatScreen.css";
+// import ReactMarkdown from "react-markdown";
+// import showdown from "showdown";
+import Markdown from "marked-react";
+
 // import axios from "axios";
 
 interface UserInput {
@@ -10,6 +14,7 @@ interface UserInput {
 interface Message {
   text: string;
   isUser: boolean;
+  isMarkdown: boolean;
 }
 
 export default function ChatScreen() {
@@ -23,7 +28,7 @@ export default function ChatScreen() {
 
   const handleSend = () => {
     if (text.trim() !== "") {
-      const userMessage: Message = { text: text, isUser: true };
+      const userMessage: Message = { text: text, isUser: true, isMarkdown: false };
       setMessages([...messages, userMessage]);
       setText("");
 
@@ -63,11 +68,18 @@ export default function ChatScreen() {
 
   const appendChunk = (value: string) => {
     // prevMessages is the current state of the messages array before updates
+
+    // const converter = new showdown.Converter();
+
+    // converter.makeHTML(value);
+
     setMessages((prevMessages) => {
       // gets the last message from prevMessages
       const lastMessage = prevMessages[prevMessages.length - 1];
 
-      // checks to see if it's the LLM response
+      //   const cleanedValue = value.replace(/(?:\r\n|\r|\n)/g, "<br>");
+      //   console.log(cleanedValue);
+      // will only modify the llm responses
       if (lastMessage && !lastMessage.isUser) {
         // creates shallow copy of the prevMessages
         const updatedMessage = [...prevMessages];
@@ -80,11 +92,12 @@ export default function ChatScreen() {
         };
         return updatedMessage;
       } else {
-        return [...prevMessages, { text: value, isUser: false }];
+        return [...prevMessages, { text: value, isUser: false, isMarkdown: true }];
       }
     });
   };
 
+  // refactored from axios due to axios not streaming on post requests
   const readStream = async (data: UserInput) => {
     try {
       await fetch("http://127.0.0.1:8000/chat_stream/", {
@@ -127,7 +140,7 @@ export default function ChatScreen() {
         {messages.map((message, index) => (
           // displays the messages in their correct locations depending on if it's a user or llm message
           <div key={index} className={`message ${message.isUser ? "user-message" : "llm-message"}`}>
-            {message.text}
+            {message.isMarkdown ? <Markdown>{message.text}</Markdown> : message.text}
           </div>
         ))}
       </div>

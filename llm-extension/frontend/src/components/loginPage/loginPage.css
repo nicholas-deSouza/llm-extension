@@ -40,13 +40,13 @@ input {
   transform: translateX(-50%);
 }
 
-p {
+/* p {
   position: fixed;
   top: 300px;
   left: 20%;
   transform: translateX(-10%);
   border: 5px solid red;
-}
+} */
 
 /* .email-input {
     width: 250px;

@@ -32,7 +32,7 @@
   background-color: black;
   align-self: flex-end; /* Aligns the message to the right */
   clear: both; /* Ensures messages are not on the same line */
-  width: fit-content; /* Adjusts the width of the message container */
+  max-width: 400px;
 }
 
 .llm-message {
