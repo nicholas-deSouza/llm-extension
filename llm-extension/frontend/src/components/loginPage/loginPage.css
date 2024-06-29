@@ -28,6 +28,7 @@
   border: 5px solid red;
 }
 
+/* change to file specific class name */
 input {
   width: 250px;
   font-size: 20px;

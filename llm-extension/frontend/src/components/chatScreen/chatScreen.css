@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 90vh;
+  overflow: hidden; /* Prevent the entire page from scrolling */
 }
 
 .chat-container {
@@ -11,6 +12,7 @@
   border: 1px solid #ccc;
   display: flex;
   flex-direction: column;
+  overflow-y: auto; /* Makes the chat container scrollable */
 }
 
 .input-container {

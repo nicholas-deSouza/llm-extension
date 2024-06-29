@@ -20,7 +20,9 @@ interface Message {
 export default function ChatScreen() {
   const [text, setText] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-  //   const [streamingMessage, setStreamingMessage] = useState("");
+  const [isStreaming, setIsStreaming] = useState(Boolean);
+  // managing this state so the fetch properly associates with the correct controller to abort
+  const [controller, setController] = useState(new AbortController());
 
   const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value);
@@ -46,32 +48,8 @@ export default function ChatScreen() {
     }
   };
 
-  //refactor this to use fetch instead to stream responses
-  //   const sendUserInput = async (data: UserInput) => {
-  //     try {
-  //       const response = await axios.post("http://127.0.0.1:8000/chat_stream/", data, {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
-
-  //       if (response && response.data) {
-  //         const llmMessage: Message = { text: response.data, isUser: false };
-  //         setMessages((prevMessages) => [...prevMessages, llmMessage]);
-  //       } else {
-  //         console.error("Invalid response format:", response.data);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //     }
-  //   };
-
   const appendChunk = (value: string) => {
     // prevMessages is the current state of the messages array before updates
-
-    // const converter = new showdown.Converter();
-
-    // converter.makeHTML(value);
 
     setMessages((prevMessages) => {
       // gets the last message from prevMessages
@@ -97,46 +75,64 @@ export default function ChatScreen() {
     });
   };
 
+  const abortStream = () => {
+    controller.abort();
+    setIsStreaming(false);
+    console.log("Abort signal sent");
+  };
+
   // refactored from axios due to axios not streaming on post requests
   const readStream = async (data: UserInput) => {
+    const newController = new AbortController();
+    setController(newController);
+
     try {
-      await fetch("http://127.0.0.1:8000/chat_stream/", {
+      const response = await fetch("http://127.0.0.1:8000/chat_stream/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        signal: newController.signal,
         body: JSON.stringify(data),
-      }).then(async function (response) {
-        const reader = response.body!.pipeThrough(new TextDecoderStream()).getReader();
+      });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const reader = response.body!.pipeThrough(new TextDecoderStream()).getReader();
+
+      setIsStreaming(true);
+
+      try {
         // eslint-disable-next-line no-constant-condition
         while (true) {
           const { value, done } = await reader.read();
 
           if (done) break;
           appendChunk(value!);
-          //   console.log("Received", value);
         }
-
-        // const llmMessage: Message = { text: streamingMessage, isUser: false };
-        // setMessages((prevMessages) => [...prevMessages, llmMessage]);
-        // setStreamingMessage("");
-
-        // const responseText = await response.text();
-        // console.log(responseText);
-        // const llmMessage: Message = { text: responseText, isUser: false };
-        // setMessages((prevMessages) => [...prevMessages, llmMessage]);
-        //   return response.text();
-      });
+      } catch (error) {
+        if (error.name === "AbortError") {
+          console.log("Stream reading aborted");
+        } else {
+          throw error;
+        }
+      } finally {
+        reader.releaseLock();
+      }
     } catch (error) {
-      console.log("Error with reading stream:", error);
+      if (error.name === "AbortError") {
+        console.log("Fetch aborted");
+      } else {
+        console.error("Error with reading stream:", error);
+      }
     }
   };
 
   return (
     <div className="chat-screen">
       <div className="chat-container">
-        {/* <div className="test">hi, {inProgress}</div> */}
         {messages.map((message, index) => (
           // displays the messages in their correct locations depending on if it's a user or llm message
           <div key={index} className={`message ${message.isUser ? "user-message" : "llm-message"}`}>
@@ -153,7 +149,11 @@ export default function ChatScreen() {
           onChange={handleTextChange}
           onKeyDown={handleKeyPress}
         />
-        <button onClick={handleSend}>send</button>
+        {isStreaming ? (
+          <button onClick={abortStream}> abort </button>
+        ) : (
+          <button onClick={handleSend}>send</button>
+        )}
       </div>
     </div>
   );
