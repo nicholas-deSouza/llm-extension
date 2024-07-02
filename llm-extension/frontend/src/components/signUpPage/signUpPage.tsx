@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../../utils/supabaseClient";
+// import { createClient } from "@supabase/supabase-js";
 import "./signUpPage.css";
 
 export default function SignUpPage() {
@@ -40,9 +41,10 @@ export default function SignUpPage() {
       console.log(session);
       if (event === "SIGNED_IN") {
         navigate("/success");
-      } else {
-        navigate("/signup");
       }
+      // else {
+      //   navigate("/login");
+      // }
     });
 
     // this removes the listener created above to stop the component from being re rendered
@@ -78,7 +80,7 @@ export default function SignUpPage() {
             <h3>Sign up</h3>
           </button>
           <p>
-            Already have an account? <a href="http://localhost:5173/login">Login here!</a>
+            Already have an account? <Link to="/login">Login here!</Link>
           </p>
         </form>
       </div>

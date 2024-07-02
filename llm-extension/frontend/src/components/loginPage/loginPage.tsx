@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../../utils/supabaseClient";
+// import { createClient } from "@supabase/supabase-js";
 import "./loginPage.css";
 
 export default function LoginPage() {
@@ -75,7 +76,7 @@ export default function LoginPage() {
             <h3>Login</h3>
           </button>
           <p>
-            Don't have an account? <a href="http://localhost:5173/signup">Sign up here!</a>
+            Don't have an account? <Link to="/signup">Sign up here!</Link>
           </p>
         </form>
       </div>

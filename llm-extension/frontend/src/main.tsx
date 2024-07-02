@@ -2,18 +2,18 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import { RouterProvider, createHashRouter } from "react-router-dom";
+import { RouterProvider, createHashRouter, Navigate } from "react-router-dom";
 // import LoginPage from "./components/loginPage/loginPage.tsx";
 import ChatScreen from "./components/chatScreen/chatScreen";
 // import { Home } from "./components/home";
 import Settings from "./components/settingsPage/settings";
-// import SignUpPage from "./components/signUpPage/signUpPage";
+import SignUpPage from "./components/signUpPage/signUpPage";
 import SuccessPage from "./components/successPage/successPage";
 import LoginPage from "./components/loginPage/loginPage";
 import HomePage from "./components/homePage/homePage";
 
 {
-  /* <Route path="/" element={<Navigate to="/login" />} /> */
+  // /* <Route path="/" element={<Navigate to="/login" />} /> */
 }
 {
   /* <Route path="#/" element={<ChatScreen />} /> */
@@ -29,14 +29,18 @@ import HomePage from "./components/homePage/homePage";
 const router = createHashRouter([
   {
     path: "/",
+    element: <Navigate to="/login" />,
+  },
+  {
+    path: "/login",
     element: <LoginPage />,
   },
-  // {
-  //   path: "/",
-  //   element: <SignUpPage />,
-  // },
   {
     path: "/signup",
+    element: <SignUpPage />,
+  },
+  {
+    path: "/settings",
     element: <Settings />,
   },
   {
